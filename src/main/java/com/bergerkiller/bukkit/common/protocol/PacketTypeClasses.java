@@ -226,13 +226,13 @@ public class PacketTypeClasses {
 		public final FieldAccessor<Byte> pitch = getField("f");
 		public final FieldAccessor<Boolean> onGround = getField("onGround");
 		private final SafeConstructor<CommonPacket> constructor1 = getPacketConstructor(EntityRef.TEMPLATE.getType());
-		private final SafeConstructor<CommonPacket> constructor2 = getPacketConstructor(int.class, int.class, int.class, int.class, byte.class, byte.class, boolean.class);
+		private final SafeConstructor<CommonPacket> constructor2 = getPacketConstructor(int.class, int.class, int.class, int.class, byte.class, byte.class, boolean.class, boolean.class);
 
 		public CommonPacket newInstance(org.bukkit.entity.Entity entity) {
 			return constructor1.newInstance(Conversion.toEntityHandle.convert(entity));
 		}
-		public CommonPacket newInstance(int entityId, int x, int y, int z, byte yaw, byte pitch, boolean onGround) {
-			return constructor2.newInstance(entityId, x, y, z, yaw, pitch, onGround);
+		public CommonPacket newInstance(int entityId, int x, int y, int z, byte yaw, byte pitch, boolean b, boolean c) {
+			return constructor2.newInstance(entityId, x, y, z, yaw, pitch, b, c);
 		}
 	}
 

@@ -7,6 +7,18 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.List;
 
+import net.minecraft.server.AttributeMapServer;
+import net.minecraft.server.Entity;
+import net.minecraft.server.FoodMetaData;
+import net.minecraft.server.GenericAttributes;
+import net.minecraft.server.InventoryEnderChest;
+import net.minecraft.server.ItemStack;
+import net.minecraft.server.MobEffect;
+import net.minecraft.server.NBTCompressedStreamTools;
+import net.minecraft.server.NBTTagCompound;
+import net.minecraft.server.NBTTagList;
+import net.minecraft.server.PlayerInventory;
+
 import org.bukkit.block.BlockState;
 import org.bukkit.craftbukkit.inventory.CraftInventoryCustom;
 import org.bukkit.craftbukkit.inventory.CraftItemStack;
@@ -22,18 +34,6 @@ import com.bergerkiller.bukkit.common.nbt.CommonTagList;
 import com.bergerkiller.bukkit.common.nbt.NBTTagInfo;
 import com.bergerkiller.bukkit.common.reflection.classes.EntityLivingRef;
 import com.bergerkiller.bukkit.common.reflection.classes.NBTRef;
-
-import net.minecraft.server.AttributeMapServer;
-import net.minecraft.server.Entity;
-import net.minecraft.server.FoodMetaData;
-import net.minecraft.server.GenericAttributes;
-import net.minecraft.server.InventoryEnderChest;
-import net.minecraft.server.ItemStack;
-import net.minecraft.server.MobEffect;
-import net.minecraft.server.NBTCompressedStreamTools;
-import net.minecraft.server.NBTTagCompound;
-import net.minecraft.server.NBTTagList;
-import net.minecraft.server.PlayerInventory;
 
 /**
  * Contains utility functions for dealing with NBT data

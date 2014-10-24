@@ -819,7 +819,7 @@ public abstract class EntityNetworkController<T extends CommonEntity<?>> extends
 	 * @return a packet with absolute position information
 	 */
 	public CommonPacket getLocationPacket(int posX, int posY, int posZ, int yaw, int pitch) {
-		return PacketType.OUT_ENTITY_TELEPORT.newInstance(entity.getEntityId(), posX, posY, posZ, (byte) yaw, (byte) pitch, entity.isOnGround());
+		return PacketType.OUT_ENTITY_TELEPORT.newInstance(entity.getEntityId(), posX, posY, posZ, (byte) yaw, (byte) pitch, false, false);
 	}
 
 	/**
