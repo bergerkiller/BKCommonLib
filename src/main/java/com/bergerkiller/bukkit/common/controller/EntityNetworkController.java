@@ -763,17 +763,17 @@ public abstract class EntityNetworkController<T extends CommonEntity<?>> extends
 				// Update rotation and position relatively
 				locSynched.set(posX, posY, posZ, yaw, pitch);
 				broadcast(PacketType.OUT_ENTITY_MOVE_LOOK.newInstance(entity.getEntityId(), 
-						(byte) deltaX, (byte) deltaY, (byte) deltaZ, (byte) yaw, (byte) pitch));
+						(byte) deltaX, (byte) deltaY, (byte) deltaZ, (byte) yaw, (byte) pitch, entity.isOnGround()));
 			} else {
 				// Only update position relatively
 				locSynched.set(posX, posY, posZ);
 				broadcast(PacketType.OUT_ENTITY_MOVE.newInstance(entity.getEntityId(), 
-						(byte) deltaX, (byte) deltaY, (byte) deltaZ));
+						(byte) deltaX, (byte) deltaY, (byte) deltaZ, entity.isOnGround()));
 			}
 		} else if (rotation) {
 			// Only update rotation
 			locSynched.setRotation(yaw, pitch);
-			broadcast(PacketType.OUT_ENTITY_LOOK.newInstance(entity.getEntityId(), (byte) yaw, (byte) pitch));
+			broadcast(PacketType.OUT_ENTITY_LOOK.newInstance(entity.getEntityId(), (byte) yaw, (byte) pitch, entity.isOnGround()));
 		}
 	}
 
@@ -819,7 +819,7 @@ public abstract class EntityNetworkController<T extends CommonEntity<?>> extends
 	 * @return a packet with absolute position information
 	 */
 	public CommonPacket getLocationPacket(int posX, int posY, int posZ, int yaw, int pitch) {
-		return PacketType.OUT_ENTITY_TELEPORT.newInstance(entity.getEntityId(), posX, posY, posZ, (byte) yaw, (byte) pitch);
+		return PacketType.OUT_ENTITY_TELEPORT.newInstance(entity.getEntityId(), posX, posY, posZ, (byte) yaw, (byte) pitch, false, false);
 	}
 
 	/**

@@ -195,10 +195,11 @@ public class PacketTypeClasses {
 	public static class NMSPacketPlayOutEntityLook extends NMSPacketPlayOutEntity {
 		public final FieldAccessor<Byte> yaw = getField("e");
 		public final FieldAccessor<Byte> pitch = getField("f");
-		private final SafeConstructor<CommonPacket> constructor1 = getPacketConstructor(int.class, byte.class, byte.class);
+		public final FieldAccessor<Boolean> onGround = getField("onGround");
+		private final SafeConstructor<CommonPacket> constructor1 = getPacketConstructor(int.class, byte.class, byte.class, boolean.class);
 
-		public CommonPacket newInstance(int entityId, byte dyaw, byte dpitch) {
-			return constructor1.newInstance(entityId, dyaw, dpitch);
+		public CommonPacket newInstance(int entityId, byte dyaw, byte dpitch, boolean onGround) {
+			return constructor1.newInstance(entityId, dyaw, dpitch, onGround);
 		}
 	}
 
@@ -223,14 +224,15 @@ public class PacketTypeClasses {
 		public final FieldAccessor<Integer> z = getField("d");
 		public final FieldAccessor<Byte> yaw = getField("e");
 		public final FieldAccessor<Byte> pitch = getField("f");
+		public final FieldAccessor<Boolean> onGround = getField("onGround");
 		private final SafeConstructor<CommonPacket> constructor1 = getPacketConstructor(EntityRef.TEMPLATE.getType());
-		private final SafeConstructor<CommonPacket> constructor2 = getPacketConstructor(int.class, int.class, int.class, int.class, byte.class, byte.class);
+		private final SafeConstructor<CommonPacket> constructor2 = getPacketConstructor(int.class, int.class, int.class, int.class, byte.class, byte.class, boolean.class, boolean.class);
 
 		public CommonPacket newInstance(org.bukkit.entity.Entity entity) {
 			return constructor1.newInstance(Conversion.toEntityHandle.convert(entity));
 		}
-		public CommonPacket newInstance(int entityId, int x, int y, int z, byte yaw, byte pitch) {
-			return constructor2.newInstance(entityId, x, y, z, yaw, pitch);
+		public CommonPacket newInstance(int entityId, int x, int y, int z, byte yaw, byte pitch, boolean b, boolean c) {
+			return constructor2.newInstance(entityId, x, y, z, yaw, pitch, b, c);
 		}
 	}
 
@@ -330,16 +332,16 @@ public class PacketTypeClasses {
 		public final FieldAccessor<Integer> z = getField("b");
 		public final FieldAccessor<Integer> chunkDataBitMap = getField("c");
 		public final FieldAccessor<Integer> chunkBiomeBitMap = getField("d");
-		private final SafeConstructor<CommonPacket> constructor1 = getPacketConstructor(CommonUtil.getNMSClass("Chunk"), boolean.class, int.class);
+		private final SafeConstructor<CommonPacket> constructor1 = getPacketConstructor(CommonUtil.getNMSClass("Chunk"), boolean.class, int.class, int.class);
 
-		public CommonPacket newInstance(Chunk chunk) {
-			return newInstance(Conversion.toChunkHandle.convert(chunk));
+		public CommonPacket newInstance(Chunk chunk, int version) {
+			return newInstance(Conversion.toChunkHandle.convert(chunk), version);
 		}
-		public CommonPacket newInstance(Object chunk) {
-			return newInstance(chunk, true, 0xFFFF);
+		public CommonPacket newInstance(Object chunk, int version) {
+			return newInstance(chunk, true, 0xFFFF, version);
 		}
-		public CommonPacket newInstance(Object chunk, boolean hasBiomeData, int sectionsMask) {
-			return constructor1.newInstance(chunk, hasBiomeData, sectionsMask);
+		public CommonPacket newInstance(Object chunk, boolean hasBiomeData, int sectionsMask, int version) {
+			return constructor1.newInstance(chunk, hasBiomeData, sectionsMask, version);
 		}
 	}
 
@@ -353,10 +355,10 @@ public class PacketTypeClasses {
 		public final FieldAccessor<byte[]> deflatedData = getField("buffer");
 		public final FieldAccessor<Integer> deflatedSize = getField("size");
 		public final FieldAccessor<Boolean> hasSkyLight = getField("h");
-		private final SafeConstructor<CommonPacket> constructor1 = getPacketConstructor(List.class);
+		private final SafeConstructor<CommonPacket> constructor1 = getPacketConstructor(List.class, int.class);
 
-		public CommonPacket newInstance(List<Chunk> chunks) {
-			return constructor1.newInstance(new ConvertingList<Object>(chunks, ConversionPairs.chunk.reverse()));
+		public CommonPacket newInstance(List<Chunk> chunks, int version) {
+			return constructor1.newInstance(new ConvertingList<Object>(chunks, ConversionPairs.chunk.reverse()),version);
 		}
 	}
 
@@ -399,6 +401,7 @@ public class PacketTypeClasses {
 	}
 
 	public static class NMSPacketPlayOutPlayerInfo extends NMSPacket {
+		/*
 		public final FieldAccessor<String> playerName = getField("a");
 		public final FieldAccessor<Boolean> online = getField("b");
 		public final FieldAccessor<Integer> ping = getField("c");
@@ -407,6 +410,7 @@ public class PacketTypeClasses {
 		public CommonPacket newInstance(String playerName, boolean online, int ping) {
 			return constructor1.newInstance(playerName, online, ping);
 		}
+		*/
 	}
 
 	public static class NMSPacketPlayOutPosition extends NMSPacket {
@@ -422,10 +426,11 @@ public class PacketTypeClasses {
 		public final FieldAccessor<Byte> dx = getField("b");
 		public final FieldAccessor<Byte> dy = getField("c");
 		public final FieldAccessor<Byte> dz = getField("d");
-		private final SafeConstructor<CommonPacket> constructor1 = getPacketConstructor(int.class, byte.class, byte.class, byte.class);
+		public final FieldAccessor<Boolean> onGround = getField("onGround");
+		private final SafeConstructor<CommonPacket> constructor1 = getPacketConstructor(int.class, byte.class, byte.class, byte.class, boolean.class);
 
-		public CommonPacket newInstance(int entityId, byte dx, byte dy, byte dz) {
-			return constructor1.newInstance(entityId, dx, dy, dz);
+		public CommonPacket newInstance(int entityId, byte dx, byte dy, byte dz, boolean onGround) {
+			return constructor1.newInstance(entityId, dx, dy, dz, onGround);
 		}
 	}
 
@@ -435,10 +440,11 @@ public class PacketTypeClasses {
 		public final FieldAccessor<Byte> dz = getField("d");
 		public final FieldAccessor<Byte> dyaw = getField("e");
 		public final FieldAccessor<Byte> dpitch = getField("f");
-		private final SafeConstructor<CommonPacket> constructor1 = getPacketConstructor(int.class, byte.class, byte.class, byte.class, byte.class, byte.class);
+		public final FieldAccessor<Boolean> onGround = getField("onGround");
+		private final SafeConstructor<CommonPacket> constructor1 = getPacketConstructor(int.class, byte.class, byte.class, byte.class, byte.class, byte.class, boolean.class);
 
-		public CommonPacket newInstance(int entityId, byte dx, byte dy, byte dz, byte dyaw, byte dpitch) {
-			return constructor1.newInstance(entityId, dx, dy, dz, dyaw, dpitch);
+		public CommonPacket newInstance(int entityId, byte dx, byte dy, byte dz, byte dyaw, byte dpitch, boolean onGround) {
+			return constructor1.newInstance(entityId, dx, dy, dz, dyaw, dpitch, onGround);
 		}
 	}
 

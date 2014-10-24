@@ -7,6 +7,7 @@ import net.minecraft.server.Packet;
 
 import org.bukkit.Location;
 import org.bukkit.block.Block;
+import org.bukkit.craftbukkit.entity.CraftPlayer;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 
@@ -45,7 +46,7 @@ public class PacketUtil {
 
 		// Send payload
 		if (sendPayload) {
-			sendPacket(player, PacketType.OUT_MAP_CHUNK_BULK.newInstance(Arrays.asList(chunk)));
+			sendPacket(player, PacketType.OUT_MAP_CHUNK_BULK.newInstance(Arrays.asList(chunk),((CraftPlayer)player).getHandle().playerConnection.networkManager.getVersion()));
 		}
 		// Tile entities
 		CommonPacket packet;
