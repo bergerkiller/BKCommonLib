@@ -3,7 +3,12 @@ package com.bergerkiller.bukkit.common.reflection.classes;
 import java.util.List;
 import java.util.Map;
 
-import org.bukkit.craftbukkit.util.CraftMagicNumbers;
+import org.bukkit.craftbukkit.v1_8_R1.util.CraftMagicNumbers;
+
+import net.minecraft.server.v1_8_R1.Block;
+import net.minecraft.server.v1_8_R1.BlockPosition;
+import net.minecraft.server.v1_8_R1.Chunk;
+import net.minecraft.server.v1_8_R1.EnumSkyBlock;
 
 import com.bergerkiller.bukkit.common.reflection.ClassTemplate;
 import com.bergerkiller.bukkit.common.reflection.FieldAccessor;
@@ -11,10 +16,6 @@ import com.bergerkiller.bukkit.common.reflection.MethodAccessor;
 import com.bergerkiller.bukkit.common.reflection.NMSClassTemplate;
 import com.bergerkiller.bukkit.common.reflection.SafeField;
 import com.bergerkiller.bukkit.common.utils.CommonUtil;
-
-import net.minecraft.server.Block;
-import net.minecraft.server.Chunk;
-import net.minecraft.server.EnumSkyBlock;
 
 public class ChunkRef {
 	private static final Class<?> icp = CommonUtil.getNMSClass("IChunkProvider");
@@ -33,7 +34,7 @@ public class ChunkRef {
 	public static final FieldAccessor<Map<?, ?>> tileEntities = TEMPLATE.getField("tileEntities");
 	public static final FieldAccessor<List<Object>[]> entitySlices = TEMPLATE.getField("entitySlices");
 	public static final FieldAccessor<Object> worldProvider = new SafeField<Object>(CommonUtil.getNMSClass("World"), "worldProvider");
-	public static final FieldAccessor<Boolean> hasSkyLight = new SafeField<Boolean>(CommonUtil.getNMSClass("WorldProvider"), "g");
+	public static final FieldAccessor<Boolean> hasSkyLight = new SafeField<Boolean>(CommonUtil.getNMSClass("WorldProvider"), "e");//was g
 
 	public static void loadNeighbours(Object chunkHandle, Object chunkProvider1, Object chunkProvider2, int x, int z) {
 		loadNeighbours.invoke(chunkHandle, chunkProvider1, chunkProvider2, x, z);
@@ -67,7 +68,7 @@ public class ChunkRef {
 	 * @return chunk section highest y-position
 	 */
 	public static int getTopSectionY(Object chunkHandle) {
-		return ((Chunk) chunkHandle).h();
+		return ((Chunk) chunkHandle).g();
 	}
 
 	public static int getHeight(Object chunkHandle, int x, int z) {
@@ -88,24 +89,28 @@ public class ChunkRef {
 		} else if (y >= ((Chunk) chunkHandle).world.getWorld().getMaxHeight()) {
 			return mode.c;
 		}
-		return ((Chunk) chunkHandle).getBrightness(mode, x & XZ_MASK, y, z & XZ_MASK);
+		return ((Chunk) chunkHandle).getBrightness(mode, new BlockPosition(x & XZ_MASK, y, z & XZ_MASK));
 	}
 
-	public static boolean setBlock(Object chunkHandle, int x, int y, int z, Object type, int data) {
-		return ((Chunk) chunkHandle).a(x & XZ_MASK, y, z & XZ_MASK, (Block) type, data);
+	public static boolean setBlock(Object chunkHandle, int x, int y, int z,Object type, int data) {
+
+		/*Needs to be changed, not sure how to set nms block data
+		 */
+		return ((Chunk) chunkHandle).world.a(new BlockPosition(x & XZ_MASK, y, z & XZ_MASK),((Block)type));
+		//return ((Chunk) chunkHandle).a(x & XZ_MASK, y, z & XZ_MASK,(Block)type, data);
 	}
 
 	@Deprecated
 	public static boolean setBlock(Object chunkHandle, int x, int y, int z, int typeId, int data) {
-		return setBlock(chunkHandle, x, y, z, CraftMagicNumbers.getBlock(typeId), data);
+		return setBlock(chunkHandle, x, y, z, typeId, data);
 	}
 
 	public static int getData(Object chunkHandle, int x, int y, int z) {
-		return ((Chunk) chunkHandle).getData(x & XZ_MASK, y, z & XZ_MASK);
+		return ((Chunk) chunkHandle).b(new BlockPosition(x & XZ_MASK, y, z & XZ_MASK));
 	}
 
 	public static Object getType(Object chunkHandle, int x, int y, int z) {
-		return ((Chunk) chunkHandle).getType(x & XZ_MASK, y, z & XZ_MASK);
+		return ((Chunk) chunkHandle).getType(new BlockPosition(x & XZ_MASK, y, z & XZ_MASK));
 	}
 
 	@Deprecated

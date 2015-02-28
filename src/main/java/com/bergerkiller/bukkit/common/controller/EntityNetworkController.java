@@ -3,18 +3,18 @@ package com.bergerkiller.bukkit.common.controller;
 import java.util.Collection;
 import java.util.Collections;
 
+import net.minecraft.server.v1_8_R1.AttributeMapServer;
+import net.minecraft.server.v1_8_R1.EntityLiving;
+import net.minecraft.server.v1_8_R1.EntityTrackerEntry;
+import net.minecraft.server.v1_8_R1.MathHelper;
+import net.minecraft.server.v1_8_R1.MobEffect;
+
 import org.bukkit.World;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.HumanEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.player.PlayerVelocityEvent;
 import org.bukkit.util.Vector;
-
-import net.minecraft.server.AttributeMapServer;
-import net.minecraft.server.EntityLiving;
-import net.minecraft.server.EntityTrackerEntry;
-import net.minecraft.server.MathHelper;
-import net.minecraft.server.MobEffect;
 
 import com.bergerkiller.bukkit.common.Common;
 import com.bergerkiller.bukkit.common.bases.mutable.IntLocationAbstract;
@@ -24,6 +24,7 @@ import com.bergerkiller.bukkit.common.bases.mutable.VectorAbstract;
 import com.bergerkiller.bukkit.common.conversion.Conversion;
 import com.bergerkiller.bukkit.common.entity.CommonEntity;
 import com.bergerkiller.bukkit.common.entity.CommonEntityController;
+import com.bergerkiller.bukkit.common.entity.nms.EnumEntitySize;
 import com.bergerkiller.bukkit.common.entity.nms.NMSEntityTrackerEntry;
 import com.bergerkiller.bukkit.common.protocol.CommonPacket;
 import com.bergerkiller.bukkit.common.protocol.PacketType;
@@ -44,6 +45,9 @@ import com.bergerkiller.bukkit.common.wrappers.DataWatcher;
  * @param <T> - type of Common Entity this controller is for
  */
 public abstract class EntityNetworkController<T extends CommonEntity<?>> extends CommonEntityController<T> {
+	
+	private EnumEntitySize es;
+	
 	/**
 	 * The maximum allowed distance per relative movement update
 	 */
@@ -397,13 +401,12 @@ public abstract class EntityNetworkController<T extends CommonEntity<?>> extends
 		// Potential leash
 		Entity leashHolder = entity.getLeashHolder();
 		if (leashHolder != null) {
-			PacketUtil.sendPacket(viewer, PacketType.OUT_ENTITY_ATTACH.newInstance(entity.getEntity(), leashHolder, 1));
+			//PacketUtil.sendPacket(viewer, PacketType.OUT_ENTITY_ATTACH.newInstance(entity.getEntity(), leashHolder, 1));
 		}
 
 		// Human entity sleeping action
 		if (entity.getEntity() instanceof HumanEntity && ((HumanEntity) entity.getEntity()).isSleeping()) {
-			PacketUtil.sendPacket(viewer, PacketType.OUT_BED.newInstance((HumanEntity) entity.getEntity(), 
-					entity.loc.x.block(), entity.loc.y.block(), entity.loc.z.block()));
+			//PacketUtil.sendPacket(viewer, PacketType.OUT_BED.newInstance((HumanEntity) entity.getEntity(), entity.loc.x.block(), entity.loc.y.block(), entity.loc.z.block()));
 		}
 
 		// Initial entity head rotation
@@ -763,17 +766,17 @@ public abstract class EntityNetworkController<T extends CommonEntity<?>> extends
 				// Update rotation and position relatively
 				locSynched.set(posX, posY, posZ, yaw, pitch);
 				broadcast(PacketType.OUT_ENTITY_MOVE_LOOK.newInstance(entity.getEntityId(), 
-						(byte) deltaX, (byte) deltaY, (byte) deltaZ, (byte) yaw, (byte) pitch));
+						(byte) deltaX, (byte) deltaY, (byte) deltaZ, (byte) yaw, (byte) pitch, entity.isOnGround()));
 			} else {
 				// Only update position relatively
 				locSynched.set(posX, posY, posZ);
 				broadcast(PacketType.OUT_ENTITY_MOVE.newInstance(entity.getEntityId(), 
-						(byte) deltaX, (byte) deltaY, (byte) deltaZ));
+						(byte) deltaX, (byte) deltaY, (byte) deltaZ, entity.isOnGround()));
 			}
 		} else if (rotation) {
 			// Only update rotation
 			locSynched.setRotation(yaw, pitch);
-			broadcast(PacketType.OUT_ENTITY_LOOK.newInstance(entity.getEntityId(), (byte) yaw, (byte) pitch));
+			broadcast(PacketType.OUT_ENTITY_LOOK.newInstance(entity.getEntityId(), (byte) yaw, (byte) pitch, entity.isOnGround()));
 		}
 	}
 
@@ -819,7 +822,7 @@ public abstract class EntityNetworkController<T extends CommonEntity<?>> extends
 	 * @return a packet with absolute position information
 	 */
 	public CommonPacket getLocationPacket(int posX, int posY, int posZ, int yaw, int pitch) {
-		return PacketType.OUT_ENTITY_TELEPORT.newInstance(entity.getEntityId(), posX, posY, posZ, (byte) yaw, (byte) pitch);
+		return PacketType.OUT_ENTITY_TELEPORT.newInstance(entity.getEntityId(), posX, posY, posZ, (byte) yaw, (byte) pitch, false);
 	}
 
 	/**
@@ -852,8 +855,8 @@ public abstract class EntityNetworkController<T extends CommonEntity<?>> extends
 			packet.write(PacketType.OUT_ENTITY_SPAWN.y, locSynched.getY());
 			packet.write(PacketType.OUT_ENTITY_SPAWN.z, locSynched.getZ());
 			// Rotation
-			packet.write(PacketType.OUT_ENTITY_SPAWN.yaw, (byte) locSynched.getYaw());
-			packet.write(PacketType.OUT_ENTITY_SPAWN.pitch, (byte) locSynched.getPitch());
+			packet.write(PacketType.OUT_ENTITY_SPAWN.yaw, locSynched.getYaw());
+			packet.write(PacketType.OUT_ENTITY_SPAWN.pitch, locSynched.getPitch());
 		}
 		return packet;
 	}
@@ -893,6 +896,6 @@ public abstract class EntityNetworkController<T extends CommonEntity<?>> extends
 	}
 
 	private int protLoc(double loc) {
-		return ((EntityTrackerEntry) handle).tracker.as.a(loc);
+		return this.es.a(loc);
 	}
 }

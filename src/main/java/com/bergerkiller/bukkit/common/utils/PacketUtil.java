@@ -3,7 +3,7 @@ package com.bergerkiller.bukkit.common.utils;
 import java.util.Arrays;
 import java.util.Collection;
 
-import net.minecraft.server.Packet;
+import net.minecraft.server.v1_8_R1.Packet;
 
 import org.bukkit.Location;
 import org.bukkit.block.Block;
@@ -45,7 +45,7 @@ public class PacketUtil {
 
 		// Send payload
 		if (sendPayload) {
-			sendPacket(player, PacketType.OUT_MAP_CHUNK_BULK.newInstance(Arrays.asList(chunk)));
+			//sendPacket(player, PacketType.OUT_MAP_CHUNK_BULK.newInstance(Arrays.asList(chunk), 47));
 		}
 		// Tile entities
 		CommonPacket packet;
@@ -57,6 +57,7 @@ public class PacketUtil {
 
 		// Entity spawn messages
 		CommonUtil.nextTick(new Runnable() {
+                        @Override
 			public void run() {
 				WorldUtil.getTracker(player.getWorld()).spawnEntities(player, chunk);
 			}
