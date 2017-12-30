@@ -286,6 +286,7 @@ public class CommonTabController implements PacketListener, Listener {
 
 	@Override
 	public void onPacketSend(PacketSendEvent event) {
+		/*
 		if (event.getType() == PacketType.OUT_PLAYER_INFO && !event.isCancelled()) {
 			CommonPacket packet = event.getPacket();
 			String name = packet.read(PacketType.OUT_PLAYER_INFO.playerName);
@@ -293,6 +294,7 @@ public class CommonTabController implements PacketListener, Listener {
 			boolean register = packet.read(PacketType.OUT_PLAYER_INFO.online);
 			event.setCancelled(!getInfo(event.getPlayer()).handlePlayerInfoPacket(name, ping, register));
 		}
+		*/
 	}
 
 	private Collection<PlayerTabInfo> getViewers(final TabView currentTab) {
@@ -537,11 +539,11 @@ public class CommonTabController implements PacketListener, Listener {
 		}
 	
 		private void hideSlot(String text) {
-			PacketUtil.sendPacket(player, PacketType.OUT_PLAYER_INFO.newInstance(text, false, 0), false);
+			//PacketUtil.sendPacket(player, PacketType.OUT_PLAYER_INFO.newInstance(text, false, 0), false);
 		}
 
 		private void showSlot(String text, int ping) {
-			PacketUtil.sendPacket(player, PacketType.OUT_PLAYER_INFO.newInstance(text, true, ping), false);
+			//PacketUtil.sendPacket(player, PacketType.OUT_PLAYER_INFO.newInstance(text, true, ping), false);
 		}
 	}
 }

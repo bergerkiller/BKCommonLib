@@ -36,7 +36,7 @@ public class LongHashSetRef {
 	public static final long FREE = TEMPLATE.<Long>getStaticFieldValue("FREE").longValue();
 	public static final long REMOVED = TEMPLATE.<Long>getStaticFieldValue("REMOVED").longValue();
 	static {
-		if (Common.IS_SPIGOT_SERVER) {
+		if (Common.IS_SPIGOT_SERVER && CommonUtil.getClass("org.spigotmc.FlatMap") != null) {
 			// Load the Spigot dummy flatmap in advance
 			SpigotDummyFlatMap.getInstance();
 			// Undo the 'FlatMap' change by Spigot - it is inefficient for our use cases

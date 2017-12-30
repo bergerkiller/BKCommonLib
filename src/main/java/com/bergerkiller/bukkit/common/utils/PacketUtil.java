@@ -45,7 +45,7 @@ public class PacketUtil {
 
 		// Send payload
 		if (sendPayload) {
-			sendPacket(player, PacketType.OUT_MAP_CHUNK_BULK.newInstance(Arrays.asList(chunk)));
+			//sendPacket(player, PacketType.OUT_MAP_CHUNK_BULK.newInstance(Arrays.asList(chunk)));
 		}
 		// Tile entities
 		CommonPacket packet;
