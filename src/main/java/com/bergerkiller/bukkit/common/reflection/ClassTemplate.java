@@ -223,6 +223,21 @@ public class ClassTemplate<T> {
 	}
 
 	/**
+	 * Checks whether a constructor is available
+	 * 
+	 * @param parameterTypes of the constructor
+	 * @return True if available
+	 */
+	public boolean hasConstructor(Class<?>... parameterTypes) {
+		try {
+			this.getType().getConstructor(parameterTypes);
+			return true;
+		} catch (Throwable t) {
+			return false;
+		}
+	}
+
+	/**
 	 * Attempts to find the constructor for this Class using the parameter types
 	 * 
 	 * @param parameterTypes of the constructor

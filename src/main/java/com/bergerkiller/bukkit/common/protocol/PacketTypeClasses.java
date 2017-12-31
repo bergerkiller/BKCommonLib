@@ -20,7 +20,6 @@ import org.bukkit.entity.HumanEntity;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.util.Vector;
 
-import com.bergerkiller.bukkit.common.Common;
 import com.bergerkiller.bukkit.common.bases.IntVector2;
 import com.bergerkiller.bukkit.common.bases.IntVector3;
 import com.bergerkiller.bukkit.common.conversion.Conversion;
@@ -195,9 +194,11 @@ public class PacketTypeClasses {
 		public final FieldAccessor<Byte> yaw = getField("e");
 		public final FieldAccessor<Byte> pitch = getField("f");
 		private final SafeConstructor<CommonPacket> constructor1;
+		private final boolean is_type_b;
 
 		public NMSPacketPlayOutEntityLook() {
-			if (Common.IS_SPIGOT_SERVER) {
+			is_type_b = hasConstructor(int.class, byte.class, byte.class, boolean.class);
+			if (is_type_b) {
 				constructor1 = getPacketConstructor(int.class, byte.class, byte.class, boolean.class);
 			} else {
 				constructor1 = getPacketConstructor(int.class, byte.class, byte.class);
@@ -205,7 +206,7 @@ public class PacketTypeClasses {
 		}
 
 		public CommonPacket newInstance(int entityId, byte dyaw, byte dpitch) {
-			if (Common.IS_SPIGOT_SERVER) {
+			if (is_type_b) {
 				return constructor1.newInstance(entityId, dyaw, dpitch, false);
 			} else {
 				return constructor1.newInstance(entityId, dyaw, dpitch);
@@ -236,9 +237,11 @@ public class PacketTypeClasses {
 		public final FieldAccessor<Byte> pitch = getField("f");
 		private final SafeConstructor<CommonPacket> constructor1 = getPacketConstructor(EntityRef.TEMPLATE.getType());
 		private final SafeConstructor<CommonPacket> constructor2;
+		private final boolean is_type_b;
 
 		public NMSPacketPlayOutEntityTeleport() {
-			if (Common.IS_SPIGOT_SERVER) {
+			is_type_b = hasConstructor(int.class, int.class, int.class, int.class, byte.class, byte.class, boolean.class, boolean.class);
+			if (is_type_b) {
 				constructor2 = getPacketConstructor(int.class, int.class, int.class, int.class, byte.class, byte.class, boolean.class, boolean.class);
 			} else {
 				constructor2 = getPacketConstructor(int.class, int.class, int.class, int.class, byte.class, byte.class);
@@ -249,7 +252,7 @@ public class PacketTypeClasses {
 			return constructor1.newInstance(Conversion.toEntityHandle.convert(entity));
 		}
 		public CommonPacket newInstance(int entityId, int x, int y, int z, byte yaw, byte pitch) {
-			if (Common.IS_SPIGOT_SERVER) {
+			if (is_type_b) {
 				return constructor2.newInstance(entityId, x, y, z, yaw, pitch, false, false);
 			} else {
 				return constructor2.newInstance(entityId, x, y, z, yaw, pitch);
@@ -423,9 +426,11 @@ public class PacketTypeClasses {
 		public final FieldAccessor<Byte> dz = getField("d");
 		
 		private final SafeConstructor<CommonPacket> constructor1;
+		private final boolean is_type_b;
 
 		public NMSPacketPlayOutRelEntityMove() {
-			if (Common.IS_SPIGOT_SERVER) {
+			is_type_b = hasConstructor(int.class, byte.class, byte.class, byte.class, boolean.class);
+			if (is_type_b) {
 				constructor1 = getPacketConstructor(int.class, byte.class, byte.class, byte.class, boolean.class);
 			} else {
 				constructor1 = getPacketConstructor(int.class, byte.class, byte.class, byte.class);
@@ -433,7 +438,7 @@ public class PacketTypeClasses {
 		}
 
 		public CommonPacket newInstance(int entityId, byte dx, byte dy, byte dz) {
-			if (Common.IS_SPIGOT_SERVER) {
+			if (is_type_b) {
 				return constructor1.newInstance(entityId, dx, dy, dz, false);
 			} else {
 				return constructor1.newInstance(entityId, dx, dy, dz);
@@ -448,9 +453,11 @@ public class PacketTypeClasses {
 		public final FieldAccessor<Byte> dyaw = getField("e");
 		public final FieldAccessor<Byte> dpitch = getField("f");
 		private final SafeConstructor<CommonPacket> constructor1;
+		private final boolean is_type_b;
 
 		public NMSPacketPlayOutRelEntityMoveLook() {
-			if (Common.IS_SPIGOT_SERVER) {
+			is_type_b = hasConstructor(int.class, byte.class, byte.class, byte.class, byte.class, byte.class, boolean.class);
+			if (is_type_b) {
 				constructor1 = getPacketConstructor(int.class, byte.class, byte.class, byte.class, byte.class, byte.class, boolean.class);
 			} else {
 				constructor1 = getPacketConstructor(int.class, byte.class, byte.class, byte.class, byte.class, byte.class);
@@ -458,7 +465,7 @@ public class PacketTypeClasses {
 		}
 
 		public CommonPacket newInstance(int entityId, byte dx, byte dy, byte dz, byte dyaw, byte dpitch) {
-			if (Common.IS_SPIGOT_SERVER) {
+			if (is_type_b) {
 				return constructor1.newInstance(entityId, dx, dy, dz, dyaw, dpitch, false);
 			} else {
 				return constructor1.newInstance(entityId, dx, dy, dz, dyaw, dpitch);
