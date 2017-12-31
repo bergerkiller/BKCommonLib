@@ -315,154 +315,162 @@ public class CommonPlugin extends PluginBase {
 
 	@Override
 	public void disable() {
-		// Disable listeners
-		for (CommonWorldListener listener : worldListeners.values()) {
-			listener.disable();
-		}
-		worldListeners.clear();
-		HandlerList.unregisterAll(listener);
-
-		// Clear running tasks
-		for (Task task : startedTasks) {
-			task.stop();
-		}
-		startedTasks.clear();
-
-		// Disable the packet handlers
 		try {
-			packetHandler.onDisable();
-		} catch (Throwable t) {
-			log(Level.SEVERE, "Failed to properly disable the Packet Handler:");
-			t.printStackTrace();
-		}
-		packetHandler = null;
-
-		// Erase all traces of BKCommonLib from this server
-		Collection<Entity> entities = new ArrayList<Entity>();
-		for (World world : WorldUtil.getWorlds()) {
-			// Unhook chunk providers
-			ChunkProviderServerHook.unhook(world);
-			// Unhook entities
-			entities.addAll(WorldUtil.getEntities(world));
-			for (Entity entity : entities) {
-				CommonEntity.clearControllers(entity);
+			// Disable listeners
+			for (CommonWorldListener listener : worldListeners.values()) {
+				listener.disable();
 			}
-			entities.clear();
+			worldListeners.clear();
+			HandlerList.unregisterAll(listener);
+
+			// Clear running tasks
+			for (Task task : startedTasks) {
+				task.stop();
+			}
+			startedTasks.clear();
+
+			// Disable the packet handlers
+			try {
+				packetHandler.onDisable();
+			} catch (Throwable t) {
+				log(Level.SEVERE, "Failed to properly disable the Packet Handler:");
+				t.printStackTrace();
+			}
+			packetHandler = null;
+
+			// Erase all traces of BKCommonLib from this server
+			Collection<Entity> entities = new ArrayList<Entity>();
+			for (World world : WorldUtil.getWorlds()) {
+				// Unhook chunk providers
+				ChunkProviderServerHook.unhook(world);
+				// Unhook entities
+				entities.addAll(WorldUtil.getEntities(world));
+				for (Entity entity : entities) {
+					CommonEntity.clearControllers(entity);
+				}
+				entities.clear();
+			}
+
+			// Server-specific disabling occurs
+			Common.SERVER.disable(this);
+		} finally {
+			// Dereference
+			instance = null;
 		}
-
-		// Server-specific disabling occurs
-		Common.SERVER.disable(this);
-
-		// Dereference
-		instance = null;
 	}
 
 	@Override
 	public void enable() {
-		// Validate version
-		final StringBuilder serverDesc = new StringBuilder(300);
-		serverDesc.append(Common.SERVER.getServerName()).append(" (");
-		serverDesc.append(Common.SERVER.getServerDescription());
-		serverDesc.append(") : ").append(Common.SERVER.getServerVersion());
-		if (Common.IS_COMPATIBLE) {
-			log(Level.INFO, "BKCommonLib is running on " + serverDesc);
-		} else {
-			log(Level.SEVERE, "This version of BKCommonLib is not compatible with: " + serverDesc);
-			log(Level.SEVERE, "It could be that BKCommonLib has to be updated, as the current version is built for MC " + Common.DEPENDENT_MC_VERSION);
-			log(Level.SEVERE, "Please look for an available BKCommonLib version that is compatible:");
-			log(Level.SEVERE, "http://dev.bukkit.org/server-mods/bkcommonlib/");
-			this.onCriticalFailure();
-			return;
-		}
-
-		// Set the packet handler to use before enabling further - it could fail!
-		if (!this.updatePacketHandler()) {
-			this.onCriticalFailure();
-			return;
-		}
-
-		// Welcome message
-		final List<String> welcomeMessages = Arrays.asList(
-				"This library is written with stability in mind.", 
-				"No Bukkit moderators were harmed while compiling this piece of art.", 
-				"Have a problem Bukkit can't fix? Write a library!",
-				"Bringing home the bacon since 2011!",
-				"Completely virus-free and scanned by various Bukkit-dev-staff watching eyes.",
-				"Hosts all the features that are impossible to include in a single Class",
-				"CraftBukkit: redone, reworked, translated and interfaced.",
-				"Having an error? *gasp* Don't forget to file a ticket on dev.bukkit.org!",
-				"Package versioning is what brought BKCommonLib and CraftBukkit closer together!",
-				"For all the haters out there: BKCommonLib at least tries!",
-				"Want fries with that? We have hidden fries in the FoodUtil class.",
-				"Not enough wrappers. Needs more wrappers. Moooreee...",
-				"Reflection can open the way to everyone's heart, including CraftBukkit.",
-				"Our love is not permitted by the overlords. We must flee...",
-				"Now a plugin, a new server implementation tomorrow???",
-				"Providing support for supporting the unsupportable.",
-				"Every feature break in Bukkit makes my feature list longer.",
-				"I...I forgot an exclamation mark...*rages internally*", 
-				"I am still winning the game. Are you?",
-				"We did what our big brother couldn't",
-				"If you need syntax help visit javadocs.a.b.v1_2_3.net",
-				"v1_1_R1 1+1+1 = 3, Half life 3 confirmed?",
-				"BKCommonLib > Minecraft.a.b().q.f * Achievement.OBFUSCATED.value",
-				"BKCommonLib isn't a plugin, its a language based on english.");
-		setEnableMessage(welcomeMessages.get((int) (Math.random() * welcomeMessages.size())));
-		setDisableMessage(null);
-
-		// Initialize permissions
-		permissionHandler = new PermissionHandler();
-
-		// Initialize event factory
-		eventFactory = new CommonEventFactory();
-
-		// Initialize entity map (needs to be here because of CommonPlugin instance needed)
-		playerVisibleChunks = new EntityMap<Player, CommonPlayerMeta>();
-
-		// Initialize Entity Blacklist
-		entityBlacklist = new CommonEntityBlacklist();
-
-		// Register events and tasks, initialize
-		register(listener = new CommonListener());
-		register(new CommonPacketMonitor(), CommonPacketMonitor.TYPES);
-		register(tabController = new CommonTabController());
-		startedTasks.add(new NextTickHandler(this).start(1, 1));
-		startedTasks.add(new MoveEventHandler(this).start(1, 1));
-		startedTasks.add(new EntityRemovalHandler(this).start(1, 1));
-		startedTasks.add(new TabUpdater(this).start(1, 1));
-
-		// Operations to execute the next tick (when the server has started)
-		CommonUtil.nextTick(new Runnable() {
-			public void run() {
-				// Set server started state
-				isServerStarted = true;
-				// Tell the tabs to initialize the initial dimensions
-				getTabController().setDefaultSize();
+		try {
+			// Validate version
+			final StringBuilder serverDesc = new StringBuilder(300);
+			serverDesc.append(Common.SERVER.getServerName()).append(" (");
+			serverDesc.append(Common.SERVER.getServerDescription());
+			serverDesc.append(") : ").append(Common.SERVER.getServerVersion());
+			if (Common.IS_COMPATIBLE) {
+				log(Level.INFO, "BKCommonLib is running on " + serverDesc);
+			} else {
+				log(Level.SEVERE, "This version of BKCommonLib is not compatible with: " + serverDesc);
+				log(Level.SEVERE, "It could be that BKCommonLib has to be updated, as the current version is built for MC " + Common.DEPENDENT_MC_VERSION);
+				log(Level.SEVERE, "Please look for an available BKCommonLib version that is compatible:");
+				log(Level.SEVERE, "http://dev.bukkit.org/server-mods/bkcommonlib/");
+				this.onCriticalFailure();
+				return;
 			}
-		});
 
-		// Register listeners and hooks
-		for (World world : WorldUtil.getWorlds()) {
-			ChunkProviderServerHook.hook(world);
-			notifyWorldAdded(world);
-		}
+			// Set the packet handler to use before enabling further - it could fail!
+			if (!this.updatePacketHandler()) {
+				this.onCriticalFailure();
+				return;
+			}
 
-		// BKCommonLib Metrics
-		if (hasMetrics()) {
-			// Soft dependencies
-			getMetrics().addGraph(new SoftDependenciesGraph());
+			// Welcome message
+			final List<String> welcomeMessages = Arrays.asList(
+					"This library is written with stability in mind.", 
+					"No Bukkit moderators were harmed while compiling this piece of art.", 
+					"Have a problem Bukkit can't fix? Write a library!",
+					"Bringing home the bacon since 2011!",
+					"Completely virus-free and scanned by various Bukkit-dev-staff watching eyes.",
+					"Hosts all the features that are impossible to include in a single Class",
+					"CraftBukkit: redone, reworked, translated and interfaced.",
+					"Having an error? *gasp* Don't forget to file a ticket on dev.bukkit.org!",
+					"Package versioning is what brought BKCommonLib and CraftBukkit closer together!",
+					"For all the haters out there: BKCommonLib at least tries!",
+					"Want fries with that? We have hidden fries in the FoodUtil class.",
+					"Not enough wrappers. Needs more wrappers. Moooreee...",
+					"Reflection can open the way to everyone's heart, including CraftBukkit.",
+					"Our love is not permitted by the overlords. We must flee...",
+					"Now a plugin, a new server implementation tomorrow???",
+					"Providing support for supporting the unsupportable.",
+					"Every feature break in Bukkit makes my feature list longer.",
+					"I...I forgot an exclamation mark...*rages internally*", 
+					"I am still winning the game. Are you?",
+					"We did what our big brother couldn't",
+					"If you need syntax help visit javadocs.a.b.v1_2_3.net",
+					"v1_1_R1 1+1+1 = 3, Half life 3 confirmed?",
+					"BKCommonLib > Minecraft.a.b().q.f * Achievement.OBFUSCATED.value",
+					"BKCommonLib isn't a plugin, its a language based on english.");
+			setEnableMessage(welcomeMessages.get((int) (Math.random() * welcomeMessages.size())));
+			setDisableMessage(null);
 
-			// Depending
-			getMetrics().addGraph(new MyDependingPluginsGraph());
-		}
+			// Initialize permissions
+			permissionHandler = new PermissionHandler();
 
-		// Server-specific enabling occurs
-		Common.SERVER.enable(this);
+			// Initialize event factory
+			eventFactory = new CommonEventFactory();
 
-		// Parse BKCommonLib version to int
-		int version = this.getVersionNumber();
-		if (version != Common.VERSION) {
-			log(Level.SEVERE, "Common.VERSION needs to be updated to contain '" + version + "'!");
+			// Initialize entity map (needs to be here because of CommonPlugin instance needed)
+			playerVisibleChunks = new EntityMap<Player, CommonPlayerMeta>();
+
+			// Initialize Entity Blacklist
+			entityBlacklist = new CommonEntityBlacklist();
+
+			// Register events and tasks, initialize
+			register(listener = new CommonListener());
+			register(new CommonPacketMonitor(), CommonPacketMonitor.TYPES);
+			register(tabController = new CommonTabController());
+			startedTasks.add(new NextTickHandler(this).start(1, 1));
+			startedTasks.add(new MoveEventHandler(this).start(1, 1));
+			startedTasks.add(new EntityRemovalHandler(this).start(1, 1));
+			startedTasks.add(new TabUpdater(this).start(1, 1));
+
+			// Operations to execute the next tick (when the server has started)
+			CommonUtil.nextTick(new Runnable() {
+				public void run() {
+					// Set server started state
+					isServerStarted = true;
+					// Tell the tabs to initialize the initial dimensions
+					getTabController().setDefaultSize();
+				}
+			});
+
+			// Register listeners and hooks
+			for (World world : WorldUtil.getWorlds()) {
+				ChunkProviderServerHook.hook(world);
+				notifyWorldAdded(world);
+			}
+
+			// BKCommonLib Metrics
+			if (hasMetrics()) {
+				// Soft dependencies
+				getMetrics().addGraph(new SoftDependenciesGraph());
+
+				// Depending
+				getMetrics().addGraph(new MyDependingPluginsGraph());
+			}
+
+			// Server-specific enabling occurs
+			Common.SERVER.enable(this);
+
+			// Parse BKCommonLib version to int
+			int version = this.getVersionNumber();
+			if (version != Common.VERSION) {
+				log(Level.SEVERE, "Common.VERSION needs to be updated to contain '" + version + "'!");
+			}
+		} catch (RuntimeException ex) {
+			// Dereference and fail
+			instance = null;
+			throw ex;
 		}
 	}
 
