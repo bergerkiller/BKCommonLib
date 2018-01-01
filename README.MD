@@ -1,3 +1,15 @@
+## About
+BKCommonLib is an utility library for doing a whole lot more with (Craft)Bukkit servers.
+This old repository hosts BKCommonLib for Minecraft/Forge 1.7.10. A much more updated
+version for newer versions of Minecraft is available [here](https://github.com/bergerhealer/BKCommonLib).
+
+## Download
+You can download a release from the release subdirectory in this repository.
+
+[Download v1.59](https://github.com/bergerkiller/BKCommonLib/raw/master/release/BKCommonLib-1.59-SNAPSHOT.jar)
+
+
+## Old Stuff
 This is a library-plugin system, introducing a lot of utility classes
 
 It also simplifies coding:
