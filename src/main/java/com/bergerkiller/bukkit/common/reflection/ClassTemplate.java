@@ -258,6 +258,17 @@ public class ClassTemplate<T> {
 	}
 
 	/**
+	 * Checks whether a method exists
+	 * 
+	 * @param name of the method
+	 * @param parameterTypes of the method
+	 * @return True if it exists
+	 */
+	public boolean hasMethod(String name, Class<?>... parameterTypes) {
+		return SafeMethod.contains(this.getType(), name, parameterTypes);
+	}
+
+	/**
 	 * Attempts to find the method by name
 	 * 
 	 * @param name of the method

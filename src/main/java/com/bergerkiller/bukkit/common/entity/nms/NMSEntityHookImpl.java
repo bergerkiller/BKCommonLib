@@ -50,11 +50,6 @@ public class NMSEntityHookImpl implements NMSEntityHook {
 	}
 
 	@Override
-	public void burn(float damage) {
-		controller.onBurnDamage(damage);
-	}
-	
-	@Override
 	public void g(double dx, double dy, double dz) {
 		controller.onPush(dx, dy, dz);
 	}
@@ -136,11 +131,6 @@ public class NMSEntityHookImpl implements NMSEntityHook {
 		return controller.getEntity().getHandle(NMSEntityHook.class).super_damageEntity(damagesource, damage);
 	}
 
-	@Override
-	public void super_burn(float damage) {
-		controller.getEntity().getHandle(NMSEntityHook.class).super_burn(damage);
-	}
-	
 	@Override
 	public void super_g(double dx, double dy, double dz) {
 		controller.getEntity().getHandle(NMSEntityHook.class).super_g(dx, dy, dz);

@@ -16,6 +16,7 @@ import com.bergerkiller.bukkit.common.reflection.FieldAccessor;
 import com.bergerkiller.bukkit.common.reflection.MethodAccessor;
 import com.bergerkiller.bukkit.common.reflection.NMSClassTemplate;
 import com.bergerkiller.bukkit.common.reflection.SafeConstructor;
+import com.bergerkiller.bukkit.common.reflection.SafeDirectMethod;
 import com.bergerkiller.bukkit.common.reflection.TranslatorFieldAccessor;
 import com.bergerkiller.bukkit.common.utils.CommonUtil;
 
@@ -50,10 +51,26 @@ public class EntityRef {
 	private static final MethodAccessor<Void> playStepSound = TEMPLATE.getMethod("a", int.class, int.class, int.class, BlockRef.TEMPLATE.getType());
 	private static final MethodAccessor<Boolean> hasMovementSound = TEMPLATE.getMethod("g_");
 	private static final MethodAccessor<Void> setRotation = TEMPLATE.getMethod("b", float.class, float.class);
-	private static final MethodAccessor<Void> burn = TEMPLATE.getMethod("burn", float.class);
 	private static final MethodAccessor<Boolean> isInWaterUpdate = TEMPLATE.getMethod("N");
 	private static final MethodAccessor<Boolean> isInWaterNoUpdate = TEMPLATE.getMethod("M");
 	public static final MethodAccessor<String> getSwimSound = TEMPLATE.getMethod("H");
+
+	private static final MethodAccessor<Void> burn;
+	static {
+		if (TEMPLATE.hasMethod("burn", float.class)) {
+			burn = TEMPLATE.getMethod("burn", float.class);
+		} else {
+			final MethodAccessor<Void> burnWithInt = TEMPLATE.getMethod("burn", int.class);
+			burn = new SafeDirectMethod<Void>() {
+				@Override
+				public Void invoke(Object instance, Object... args) {
+					float dmg = (Float) args[0];
+					int dmg_int = (int) dmg;
+					return burnWithInt.invoke(instance, Integer.valueOf(dmg_int));
+				}
+			};
+		}
+	}
 
 	/* External */
 	public static final TranslatorFieldAccessor<World> world = TEMPLATE.getField("world").translate(ConversionPairs.world);

@@ -104,15 +104,6 @@ public class EntityController<T extends CommonEntity<?>> extends CommonEntityCon
 	}
 
 	/**
-	 * Fired when the entity is getting burned by something
-	 * 
-	 * @param damage dealt
-	 */
-	public void onBurnDamage(double damage) {
-		entity.getHandle(NMSEntityHook.class).super_burn((float) damage); 
-	}
-
-	/**
 	 * Gets whether this Entity Controller allows players to take this Entity with them.
 	 * With this enabled, players take the vehicle with them.
 	 * To disable this default behavior, override this method.
@@ -350,7 +341,7 @@ public class EntityController<T extends CommonEntity<?>> extends CommonEntityCon
 		// Fire tick calculation (check using block collision)
 		final boolean isInWater = handle.L(); // In water or raining
 		if (handle.world.e(handle.boundingBox.shrink(0.001, 0.001, 0.001))) {
-			onBurnDamage(1);
+			EntityRef.burn(handle, 1.0f);
 			if (!isInWater) {
 				handle.fireTicks++;
 				if (handle.fireTicks <= 0) {

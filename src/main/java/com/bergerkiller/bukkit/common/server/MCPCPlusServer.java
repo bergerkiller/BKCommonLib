@@ -1,8 +1,10 @@
 package com.bergerkiller.bukkit.common.server;
 
 import java.io.File;
+import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Locale;
 import java.util.Map;
 
 import org.bukkit.Bukkit;
@@ -22,14 +24,27 @@ public class MCPCPlusServer extends SpigotServer {
 
 	@Override
 	public boolean init() {
-		if (!super.init() || (!Bukkit.getServer().getVersion().contains("MCPC-Plus") && !Bukkit.getServer().getVersion().contains("Cauldron"))) {
+		// Check this is a CraftBukkit and Spigot capable server
+		if (!super.init()) {
 			return false;
 		}
+
 		// Obtain the Class remapper used by MCPC+
-		this.classRemapper = SafeField.get(getClass().getClassLoader(), "remapper");
-		if (this.classRemapper == null) {
-			throw new RuntimeException("Running an MCPC+ server but the remapper is unavailable...please turn it on!");
+		try {
+			ClassLoader cl = getClass().getClassLoader();
+			Field remapperField = cl.getClass().getDeclaredField("remapper");
+			remapperField.setAccessible(true);
+			this.classRemapper = remapperField.get(cl);
+			if (this.classRemapper == null) {
+				return false; // Null remapper?
+			}
+			if (!this.classRemapper.getClass().getName().toLowerCase(Locale.ENGLISH).endsWith(".jarremapper")) {
+				return false; // Don't recognize this
+			}
+		} catch (Throwable t) {
+			return false; // Not an MCPC-Plus server, when there is no remapper
 		}
+
 		// Initialize some fields and methods used by the Jar Remapper
 		ClassTemplate<?> template = ClassTemplate.create(this.classRemapper);
 		this.mapType = template.getMethod("map", String.class);

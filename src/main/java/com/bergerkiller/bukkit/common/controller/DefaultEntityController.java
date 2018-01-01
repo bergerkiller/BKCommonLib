@@ -7,7 +7,6 @@ import org.bukkit.entity.HumanEntity;
 
 import com.bergerkiller.bukkit.common.entity.nms.NMSEntityHook;
 import com.bergerkiller.bukkit.common.internal.CommonNMS;
-import com.bergerkiller.bukkit.common.reflection.classes.EntityRef;
 
 /**
  * Does nothing but redirect to the default entity behavior
@@ -55,16 +54,6 @@ public final class DefaultEntityController extends EntityController {
 			super.onDamage(damageSource, damage);
 		}
 		((Entity) entity.getHandle()).damageEntity((DamageSource) damageSource.getHandle(), (float) damage);
-	}
-
-	@Override
-	public void onBurnDamage(double damage) {
-		final Object handle = entity.getHandle();
-		if (handle instanceof NMSEntityHook) {
-			super.onBurnDamage(damage);
-		} else {
-			EntityRef.burn(handle, (float) damage);
-		}
 	}
 
 	@Override
