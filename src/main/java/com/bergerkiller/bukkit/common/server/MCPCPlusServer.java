@@ -29,6 +29,14 @@ public class MCPCPlusServer extends SpigotServer {
 			return false;
 		}
 
+		// Check if MD_5's remapper is available
+		Class<?> jarRemapperClass;
+		try {
+			jarRemapperClass = Class.forName("net.md_5.specialsource.JarRemapper");
+		} catch (ClassNotFoundException ex) {
+			return false;
+		}
+
 		// Obtain the Class remapper used by MCPC+
 		try {
 			ClassLoader cl = getClass().getClassLoader();
@@ -38,7 +46,7 @@ public class MCPCPlusServer extends SpigotServer {
 			if (this.classRemapper == null) {
 				return false; // Null remapper?
 			}
-			if (!this.classRemapper.getClass().getName().toLowerCase(Locale.ENGLISH).endsWith(".jarremapper")) {
+			if (!jarRemapperClass.isAssignableFrom(this.classRemapper.getClass())) {
 				return false; // Don't recognize this
 			}
 		} catch (Throwable t) {

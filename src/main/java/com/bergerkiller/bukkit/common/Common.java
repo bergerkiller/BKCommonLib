@@ -78,6 +78,7 @@ public class Common {
 					break;
 				}
 			}
+			CommonPlugin.LOGGER.log(Level.INFO, "Detected server " + runningServer.getServerName() + " MC " + runningServer.getMinecraftVersion());
 		} catch (Throwable t) {
 			CommonPlugin.LOGGER.log(Level.SEVERE, "An error occurred during server detection:", t);
 		}
