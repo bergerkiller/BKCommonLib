@@ -40,6 +40,7 @@ import com.bergerkiller.bukkit.common.reflection.classes.WorldServerRef;
  * Contains utilities to get and set chunks of a world
  */
 public class ChunkUtil {
+	private static boolean canUseAsyncChunkGet = true;
 	private static boolean canUseLongObjectHashMap = CommonUtil.getCBClass("util.LongObjectHashMap") != null;
 	private static boolean canUseLongHashSet = CommonUtil.getCBClass("util.LongHashSet") != null;
 	public static final FieldAccessor<List<Object>> chunkListField;
@@ -324,6 +325,7 @@ public class ChunkUtil {
 	/**
 	 * Gets, loads or generated a chunk without loading or generating it on the main thread.
 	 * Allows the lazy-loading of chunks without locking the server.
+	 * Can only be called from the main thread!
 	 * 
 	 * @param world to obtain the chunk from
 	 * @param x - coordinate of the chunk
@@ -331,7 +333,20 @@ public class ChunkUtil {
 	 * @param runnable to execute once the chunk is loaded or obtained
 	 */
 	public static void getChunkAsync(World world, final int x, final int z, Runnable runnable) {
-		CommonNMS.getNative(world).chunkProviderServer.getChunkAt(x, z, runnable);
+		if (canUseAsyncChunkGet) {
+			try {
+				CommonNMS.getNative(world).chunkProviderServer.getChunkAt(x, z, runnable);
+				return;
+			} catch (java.lang.NoSuchMethodError ex) {
+				canUseAsyncChunkGet = false;
+			}
+		}
+
+		// Sync alternative
+		world.getChunkAt(x, z);
+		if (runnable != null) {
+			runnable.run();
+		}
 	}
 
 	/**

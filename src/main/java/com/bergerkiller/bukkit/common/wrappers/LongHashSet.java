@@ -57,7 +57,18 @@ public class LongHashSet extends BasicWrapper implements Iterable<Long> {
 	}
 
 	public long[] toArray() {
-		return LongHashSetRef.toArray.invoke(handle);
+		Object arr = LongHashSetRef.toArray.invoke(handle);
+		if (arr instanceof Long[]) {
+			// Happens on Thermos server for some bizar reason
+			// To be on the safe side, I take care of it here
+			Long[] l_arr = (Long[]) arr;
+			long[] result = new long[l_arr.length];
+			for (int i = 0; i < l_arr.length; i++) {
+				result[i] = (l_arr[i] == null) ? 0L : l_arr[i].longValue();
+			}
+			return result;
+		}
+		return (long[]) arr;
 	}
 
 	public long popFirst() {
