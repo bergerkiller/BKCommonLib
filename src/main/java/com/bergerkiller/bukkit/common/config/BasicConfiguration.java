@@ -22,7 +22,7 @@ import com.bergerkiller.bukkit.common.wrappers.IntHashMap;
  * A basic YAML configuration implementation
  */
 public class BasicConfiguration extends ConfigurationNode {
-	public static final String MAIN_HEADER_PREFIX = "#> ";
+	public String MAIN_HEADER_PREFIX = "#> ";
 
 	@Override
 	public String getPath() {
